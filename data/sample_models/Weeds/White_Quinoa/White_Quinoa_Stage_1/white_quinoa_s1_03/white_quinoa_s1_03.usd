@@ -1,0 +1,29 @@
+#usda 1.0
+(
+    defaultPrim = "White_Quinoa_Stage_1_0003"
+    framesPerSecond = 24
+    metersPerUnit = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "White_Quinoa_Stage_1_0003" (
+    prepend apiSchemas = ["GeomModelAPI", "AssetPreviewsAPI"]
+    assetInfo = {
+        asset identifier = @./White_Quinoa_Stage_1_0003.usd@
+        string name = "White_Quinoa_Stage_1_0003"
+        dictionary previews = {
+            dictionary thumbnails = {
+                dictionary default = {
+                    asset defaultImage = @./thumbnail.png@
+                }
+            }
+        }
+    }
+    kind = "component"
+    prepend payload = @./payload.usdc@
+)
+{
+    float3[] extentsHint = [(-0.015378412, -0.00047590668, -0.014271339), (0.017590873, 0.024763064, 0.01772489)]
+}
+

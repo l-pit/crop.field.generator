@@ -1,0 +1,29 @@
+#usda 1.0
+(
+    defaultPrim = "Rough_Pigweed_Stage_2_0002"
+    framesPerSecond = 24
+    metersPerUnit = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "Rough_Pigweed_Stage_2_0002" (
+    prepend apiSchemas = ["GeomModelAPI", "AssetPreviewsAPI"]
+    assetInfo = {
+        asset identifier = @./Rough_Pigweed_Stage_2_0002.usd@
+        string name = "Rough_Pigweed_Stage_2_0002"
+        dictionary previews = {
+            dictionary thumbnails = {
+                dictionary default = {
+                    asset defaultImage = @./thumbnail.png@
+                }
+            }
+        }
+    }
+    kind = "component"
+    prepend payload = @./payload.usdc@
+)
+{
+    float3[] extentsHint = [(-0.019882679, -0.0030800109, -0.01490408), (0.012214965, 0.012693897, 0.023275409)]
+}
+

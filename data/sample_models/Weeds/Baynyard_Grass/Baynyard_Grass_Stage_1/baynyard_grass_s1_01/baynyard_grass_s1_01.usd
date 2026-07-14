@@ -1,0 +1,29 @@
+#usda 1.0
+(
+    defaultPrim = "Baynyard_Grass_Stage_1_0001"
+    framesPerSecond = 24
+    metersPerUnit = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "Baynyard_Grass_Stage_1_0001" (
+    prepend apiSchemas = ["GeomModelAPI", "AssetPreviewsAPI"]
+    assetInfo = {
+        asset identifier = @./Baynyard_Grass_Stage_1_0001.usd@
+        string name = "Baynyard_Grass_Stage_1_0001"
+        dictionary previews = {
+            dictionary thumbnails = {
+                dictionary default = {
+                    asset defaultImage = @./thumbnail.png@
+                }
+            }
+        }
+    }
+    kind = "component"
+    prepend payload = @./payload.usdc@
+)
+{
+    float3[] extentsHint = [(-0.042611256, 0, -0.010745427), (0.039581813, 0.04752923, 0.027930219)]
+}
+

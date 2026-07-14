@@ -1,0 +1,33 @@
+[package]
+version = "1.0.0"
+category = "Simulation"
+title = "FieldForge"
+description = "Procedurally generates field with plants and weeds"
+authors = ["Ivan Moroz", "Jion Kubo"]
+repository = "https://github.com/l-pit/pit.fieldforge"
+keywords = ["agriculture", "crop", "field", "terrain", "synthetic data", "replicator", "procedural", "domain randomization", "isaac sim"]
+changelog = "docs/CHANGELOG.md"
+readme = "README.md"
+icon = "data/icon.png"
+writeTarget.kit = true
+
+[dependencies]
+"isaacsim.core.api" = {}
+"isaacsim.gui.components" = {}
+"omni.kit.uiapp" = {}
+"omni.physx" = {}
+"omni.replicator.core" = {}
+
+[[python.module]]
+name = "fieldforge_python"
+
+# Third-party Python packages the extension imports directly. numpy ships with
+# Isaac Sim, but scipy and Pillow are not guaranteed on every install, so they
+# are declared here and pulled from PyPI on first load if missing.
+[python.pipapi]
+requirements = [
+    "numpy",
+    "scipy",
+    "Pillow",
+]
+use_online_index = true

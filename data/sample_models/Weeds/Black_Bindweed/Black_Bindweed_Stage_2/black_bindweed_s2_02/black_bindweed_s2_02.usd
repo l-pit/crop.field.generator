@@ -1,0 +1,29 @@
+#usda 1.0
+(
+    defaultPrim = "Black_Bindweed_Stage_2_0002"
+    framesPerSecond = 24
+    metersPerUnit = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "Black_Bindweed_Stage_2_0002" (
+    prepend apiSchemas = ["GeomModelAPI", "AssetPreviewsAPI"]
+    assetInfo = {
+        asset identifier = @./Black_Bindweed_Stage_2_0002.usd@
+        string name = "Black_Bindweed_Stage_2_0002"
+        dictionary previews = {
+            dictionary thumbnails = {
+                dictionary default = {
+                    asset defaultImage = @./thumbnail.png@
+                }
+            }
+        }
+    }
+    kind = "component"
+    prepend payload = @./payload.usdc@
+)
+{
+    float3[] extentsHint = [(-0.06363636, -0.0004935012, -0.036810275), (0.06248323, 0.06565485, 0.07109029)]
+}
+

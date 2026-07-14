@@ -1,0 +1,29 @@
+#usda 1.0
+(
+    defaultPrim = "Corn_V2_00010"
+    framesPerSecond = 24
+    metersPerUnit = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "Corn_V2_00010" (
+    prepend apiSchemas = ["GeomModelAPI", "AssetPreviewsAPI"]
+    assetInfo = {
+        asset identifier = @./Corn_V2_00010.usd@
+        string name = "Corn_V2_00010"
+        dictionary previews = {
+            dictionary thumbnails = {
+                dictionary default = {
+                    asset defaultImage = @./thumbnail.png@
+                }
+            }
+        }
+    }
+    kind = "component"
+    prepend payload = @./payload.usdc@
+)
+{
+    float3[] extentsHint = [(-0.0153537635, 0.0002750459, -0.04752959), (0.034338277, 0.07423451, 0.065614946)]
+}
+

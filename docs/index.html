@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FieldForge - Procedural agricultural fields for Isaac Sim</title>
+<meta name="description" content="An NVIDIA Isaac Sim extension that procedurally generates agricultural fields - crop beds, weeds, terrain and Replicator-ready synthetic data with per-seed randomization.">
+<meta name="theme-color" content="#2f7d4f">
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="FieldForge">
+<meta property="og:description" content="Procedurally generate agricultural fields and synthetic datasets in NVIDIA Isaac Sim.">
+<meta property="og:url" content="https://l-pit.github.io/pit.fieldforge/">
+<meta property="og:image" content="https://l-pit.github.io/pit.fieldforge/images/hero.jpg">
+
+<!-- Emoji favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#fbfaf6;
+    --bg-soft:#f2f1ea;
+    --card:#ffffff;
+    --text:#1a211d;
+    --muted:#5d6b63;
+    --accent:#2f7d4f;
+    --accent-soft:#e4f1e8;
+    --border:rgba(20,40,30,.10);
+    --shadow:0 1px 2px rgba(20,40,30,.04),0 10px 30px rgba(20,40,30,.08);
+    --shadow-lg:0 20px 50px rgba(20,40,30,.16);
+    --radius:16px;
+    --maxw:1080px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0e1411;
+      --bg-soft:#141d18;
+      --card:#161f1a;
+      --text:#e9efe9;
+      --muted:#9cb0a4;
+      --accent:#5fca82;
+      --accent-soft:#17281e;
+      --border:rgba(150,200,170,.14);
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+      --shadow-lg:0 24px 60px rgba(0,0,0,.55);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text);
+    background:var(--bg);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  /* ---------- Nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:saturate(160%) blur(12px);
+    background:color-mix(in srgb, var(--bg) 82%, transparent);
+    border-bottom:1px solid var(--border);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+  .brand .leaf{font-size:1.25rem}
+  .navlinks{display:flex;gap:26px;align-items:center;font-size:.94rem;font-weight:500}
+  .navlinks a{color:var(--muted)}
+  .navlinks a:hover{color:var(--text);text-decoration:none}
+  @media (max-width:640px){ .navlinks{display:none} }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    text-align:center;
+    padding:84px 0 40px;
+    background:
+      radial-gradient(1200px 400px at 50% -80px, var(--accent-soft), transparent 70%);
+  }
+  .eyebrow{
+    display:inline-block;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent);background:var(--accent-soft);
+    padding:6px 14px;border-radius:999px;margin-bottom:22px;
+  }
+  h1{
+    font-size:clamp(2.4rem,6.2vw,4.1rem);
+    line-height:1.05;letter-spacing:-.03em;font-weight:800;
+    margin:0 0 18px;
+  }
+  .tagline{
+    font-size:clamp(1.05rem,2.4vw,1.32rem);
+    color:var(--muted);max-width:660px;margin:0 auto 14px;
+  }
+  .affil-text{color:var(--muted);font-size:1rem;margin-bottom:30px}
+  .affil-text strong{color:var(--text);font-weight:600}
+  .affil-text a{color:inherit;text-decoration:none;border-bottom:1px solid var(--border);transition:border-color .15s ease,color .15s ease}
+  .affil-text a:hover{border-bottom-color:var(--accent)}
+  .affil-text a:hover strong{color:var(--accent)}
+  .logo-chip{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 22px;box-shadow:var(--shadow);display:inline-flex}
+  .logo-chip img{height:92px;width:auto;display:block}
+  .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:12px 22px;border-radius:999px;font-weight:600;font-size:.98rem;
+    border:1px solid var(--border);background:var(--card);color:var(--text);
+    box-shadow:var(--shadow);transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);text-decoration:none;box-shadow:var(--shadow-lg)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:transparent}
+  .btn svg{width:18px;height:18px}
+
+  /* ---------- Framed hero image ---------- */
+  .frame{
+    margin:44px auto 0;max-width:720px;
+    border-radius:20px;overflow:hidden;
+    border:1px solid var(--border);box-shadow:var(--shadow-lg);
+    background:var(--card);
+  }
+  .frame img{display:block;width:100%;height:auto}
+
+  /* ---------- Sections ---------- */
+  section{padding:64px 0}
+  .section-head{text-align:center;max-width:680px;margin:0 auto 44px}
+  .section-head h2{
+    font-size:clamp(1.7rem,3.6vw,2.4rem);letter-spacing:-.02em;font-weight:800;margin:0 0 12px;
+  }
+  .section-head p{color:var(--muted);font-size:1.06rem;margin:0}
+  .alt{background:var(--bg-soft)}
+
+  /* ---------- Overview ---------- */
+  .lead{
+    max-width:760px;margin:0 auto;text-align:center;
+    font-size:1.18rem;color:var(--text);
+  }
+  .lead .muted{color:var(--muted)}
+
+  /* ---------- Feature grid ---------- */
+  .grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .feature{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:26px 24px;box-shadow:var(--shadow);transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .feature:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+  .feature .ico{
+    width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+    background:var(--accent-soft);font-size:1.4rem;margin-bottom:16px;
+  }
+  .feature h3{margin:0 0 8px;font-size:1.12rem;letter-spacing:-.01em}
+  .feature p{margin:0;color:var(--muted);font-size:.97rem}
+
+  /* ---------- Gallery ---------- */
+  .gallery{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .shot{
+    position:relative;border-radius:14px;overflow:hidden;
+    border:1px solid var(--border);box-shadow:var(--shadow);cursor:zoom-in;
+    background:var(--card);
+  }
+  .shot img{display:block;width:100%;height:auto;transition:transform .5s ease}
+  .shot:hover img{transform:scale(1.05)}
+  .shot figcaption{
+    position:absolute;left:0;right:0;bottom:0;
+    padding:22px 14px 10px;font-size:.85rem;font-weight:500;color:#fff;
+    background:linear-gradient(transparent,rgba(0,0,0,.72));
+  }
+
+  /* ---------- Split (image + text) ---------- */
+  .split{display:grid;gap:44px;align-items:center;grid-template-columns:1.1fr 1fr}
+  .split.reverse{grid-template-columns:1fr 1.1fr}
+  @media (max-width:820px){ .split,.split.reverse{grid-template-columns:1fr} }
+  .split .media{
+    border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);
+    box-shadow:var(--shadow-lg);background:var(--card);cursor:zoom-in;
+  }
+  .split .media img{display:block;width:100%;height:auto}
+  .split .media.portrait{max-width:340px;margin:0 auto}
+  .split h2{font-size:clamp(1.6rem,3.4vw,2.2rem);letter-spacing:-.02em;margin:0 0 16px}
+  .split p{color:var(--muted);font-size:1.05rem;margin:0 0 16px}
+  .taglist{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .tag{
+    font-size:.85rem;font-weight:500;padding:6px 12px;border-radius:999px;
+    background:var(--accent-soft);color:var(--accent);
+  }
+  ul.checks{list-style:none;padding:0;margin:16px 0 0}
+  ul.checks li{position:relative;padding-left:28px;margin-bottom:10px;color:var(--muted)}
+  ul.checks li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700}
+
+  /* ---------- Data showcase ---------- */
+  .gallery.two{grid-template-columns:repeat(2,1fr);max-width:820px;margin:0 auto}
+  @media (max-width:560px){ .gallery.two{grid-template-columns:1fr} }
+  .data-tags{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+
+  /* ---------- License ---------- */
+  .lic{display:grid;gap:20px;grid-template-columns:1fr 1fr}
+  @media (max-width:720px){ .lic{grid-template-columns:1fr} }
+  .lic .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:26px 24px;box-shadow:var(--shadow);
+  }
+  .lic .card h3{margin:0 0 6px;font-size:1.1rem}
+  .lic .badge{
+    display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.03em;
+    padding:4px 10px;border-radius:8px;background:var(--accent-soft);color:var(--accent);margin-bottom:14px;
+  }
+  .lic .card p{margin:0;color:var(--muted);font-size:.96rem}
+
+  /* ---------- Footer ---------- */
+  footer{border-top:1px solid var(--border);padding:52px 0;color:var(--muted);font-size:.93rem}
+  footer .foot{display:flex;align-items:center;justify-content:center;gap:30px;flex-wrap:wrap}
+  .foot-text{display:flex;flex-direction:column;gap:8px}
+  .foot-title{margin:0}
+  .foot-title strong{color:var(--text);font-weight:600}
+  .foot-links{margin:0;display:flex;gap:22px}
+  .foot-copy{margin:0}
+  footer a{color:var(--muted)}
+  footer a:hover{color:var(--text)}
+
+  /* ---------- Reveal on scroll ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.6,.2,1),transform .7s cubic-bezier(.2,.6,.2,1)}
+  .reveal.visible{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){ .reveal{opacity:1;transform:none;transition:none} }
+
+  /* ---------- Lightbox ---------- */
+  #lb{
+    position:fixed;inset:0;z-index:100;display:none;
+    align-items:center;justify-content:center;padding:32px;
+    background:rgba(8,14,11,.86);backdrop-filter:blur(4px);cursor:zoom-out;
+  }
+  #lb.open{display:flex}
+  #lb img{max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="brand"><span class="leaf">🌱</span> FieldForge</span>
+    <div class="navlinks">
+      <a href="#features">Features</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#data">Synthetic Data</a>
+      <a href="#usage">Usage</a>
+      <a href="https://github.com/l-pit/pit.fieldforge">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">NVIDIA Isaac Sim Extension</span>
+    <h1>FieldForge</h1>
+    <p class="tagline">Procedurally generate agricultural fields - crop beds, weeds and terrain - and capture Replicator-ready synthetic datasets, all randomized from a single seed.</p>
+    <p class="affil-text">Developed at <a href="https://pit.lukasiewicz.gov.pl/en/" target="_blank" rel="noopener noreferrer"><strong>Łukasiewicz - Poznań Institute of Technology</strong></a></p>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/l-pit/pit.fieldforge">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        View on GitHub
+      </a>
+      <a class="btn" href="https://github.com/l-pit/pit.fieldforge#installation">🧩 Get it in Isaac Sim</a>
+      <a class="btn" href="https://github.com/l-pit/pit.fieldforge#readme">📖 Documentation</a>
+    </div>
+
+    <figure class="frame reveal">
+      <img src="images/hero.jpg" alt="Corn rows generated on ridged terrain in Isaac Sim">
+    </figure>
+  </div>
+</header>
+
+<!-- ================= OVERVIEW ================= -->
+<section id="overview">
+  <div class="wrap">
+    <p class="lead reveal">
+      FieldForge lays out crop beds, scatters weeds and deforms the ground into realistic terrain - then hands the scene to <strong>Omniverse Replicator</strong> to render annotated datasets.
+      <span class="muted">Every seed reshuffles plant placement, lighting, ground materials and camera angles, so you can produce large, diverse synthetic datasets in a few clicks.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section id="features" class="alt">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>What it does</h2>
+      <p>A complete pipeline from procedural layout to labelled training data.</p>
+    </div>
+    <div class="grid">
+      <div class="feature reveal"><div class="ico">🌽</div><h3>Procedural crop beds</h3><p>Multiple crop types with configurable rows, spacing, per-plant jitter and skip chance. Rows can be curved with a math formula.</p></div>
+      <div class="feature reveal"><div class="ico">🌿</div><h3>Multi-species weeds</h3><p>Scatter several weed species across the field by area density - weeds per square meter - for realistic infestation.</p></div>
+      <div class="feature reveal"><div class="ico">⛰️</div><h3>Procedural terrain</h3><p>Deform the ground from a heightmap or NumPy noise, with additive ridge/furrow, anisotropic roughness and scattered soil clods.</p></div>
+      <div class="feature reveal"><div class="ico">🎲</div><h3>Per-seed randomization</h3><p>Each seed randomizes the active light and its rotation plus the ground material and texture offsets to diversify every scene.</p></div>
+      <div class="feature reveal"><div class="ico">📸</div><h3>Replicator capture</h3><p>Render N frames automatically - incrementing the seed and repositioning the camera - exporting RGB and semantic segmentation.</p></div>
+      <div class="feature reveal"><div class="ico">⚡</div><h3>Two generation modes</h3><p>Fast point-instancing for rapid viewport iteration, or standard USD instancing for accurate Replicator 2D bounding boxes.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section id="gallery">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>One tool, endless fields</h2>
+      <p>Every seed produces a different ground material, terrain profile and plant layout.</p>
+    </div>
+    <div class="gallery">
+      <figure class="shot reveal zoomable"><img src="images/field-straw.jpg" alt="Straw-stubble ridged field"><figcaption>Straw-stubble ridges</figcaption></figure>
+      <figure class="shot reveal zoomable"><img src="images/field-ridged.jpg" alt="Dry ridged corn rows"><figcaption>Dry ridged rows</figcaption></figure>
+      <figure class="shot reveal zoomable"><img src="images/field-rocky.jpg" alt="Rocky soil field"><figcaption>Rocky soil</figcaption></figure>
+      <figure class="shot reveal zoomable"><img src="images/field-weeds.jpg" alt="Field with scattered weeds"><figcaption>Scattered weeds</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SYNTHETIC DATA ================= -->
+<section id="data" class="alt">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Built for synthetic data</h2>
+      <p>Disable point-instancing and the field becomes fully Replicator-ready - every frame exported with crops and weeds as separate classes, ready for training.</p>
+    </div>
+    <div class="gallery two reveal">
+      <figure class="shot zoomable"><img src="images/replicator.jpg" alt="RGB output with 2D bounding boxes for corn and weeds"><figcaption>RGB + 2D bounding boxes</figcaption></figure>
+      <figure class="shot zoomable"><img src="images/segmentation.png" alt="Semantic segmentation mask of corn and weeds"><figcaption>Semantic segmentation mask</figcaption></figure>
+    </div>
+    <div class="data-tags reveal">
+      <span class="tag">Object detection</span>
+      <span class="tag">Semantic segmentation</span>
+      <span class="tag">Domain randomization</span>
+      <span class="tag">Per-frame seed &amp; camera</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= USAGE ================= -->
+<section id="usage">
+  <div class="wrap">
+    <div class="split reverse">
+      <div class="reveal">
+        <h2>Everything in one panel</h2>
+        <p>Set the seed, dimensions and terrain, then add as many crop beds and weed species as you need. All settings are saved and restored automatically, and bundled sample corn and weed models let you generate a field the moment you enable the extension.</p>
+        <ul class="checks">
+          <li>Ships with ready-to-run sample assets</li>
+          <li>Point your own USD crop, weed, ground &amp; light assets</li>
+          <li>Formula-driven curved rows and additive terrain layers</li>
+          <li>Persistent configuration across sessions</li>
+        </ul>
+      </div>
+      <figure class="media portrait reveal zoomable"><img src="images/ui-panel.png" alt="FieldForge UI panel"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LICENSE ================= -->
+<section id="license" class="alt">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Open source</h2>
+      <p>The extension is free and copyleft; the sample assets are a non-commercial preview.</p>
+    </div>
+    <div class="lic">
+      <div class="card reveal">
+        <span class="badge">GPL-3.0-or-later</span>
+        <h3>Extension code</h3>
+        <p>Use, modify and redistribute freely - any distributed derivative must stay open source under the same license. © 2026 Łukasiewicz - PIT.</p>
+      </div>
+      <div class="card reveal">
+        <span class="badge">CC BY-NC-SA 4.0</span>
+        <h3>Sample assets</h3>
+        <p>The bundled crop and weed models are a non-commercial preview of a larger commercial library. Attribution and share-alike required. © 2026 Łukasiewicz - PIT.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span class="logo-chip"><img src="images/logo.png" alt="Łukasiewicz - Poznań Institute of Technology"></span>
+    <div class="foot-text">
+      <p class="foot-title">🌱 <strong>FieldForge</strong></p>
+      <p class="foot-links">
+        <a href="https://github.com/l-pit/pit.fieldforge">GitHub</a>
+        <a href="https://github.com/l-pit/pit.fieldforge#readme">Docs</a>
+        <a href="https://github.com/l-pit/pit.fieldforge/blob/main/LICENSE">License</a>
+      </p>
+      <p class="foot-copy">© 2026 Łukasiewicz - PIT</p>
+    </div>
+  </div>
+</footer>
+
+<div id="lb"><img src="" alt=""></div>
+
+<script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries)=>{
+    for(const e of entries){ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } }
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // Lightbox
+  const lb = document.getElementById('lb'), lbImg = lb.querySelector('img');
+  document.querySelectorAll('.zoomable img, .frame img').forEach(img=>{
+    img.style.cursor='zoom-in';
+    img.addEventListener('click',()=>{ lbImg.src=img.src; lbImg.alt=img.alt; lb.classList.add('open'); });
+  });
+  lb.addEventListener('click',()=>lb.classList.remove('open'));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') lb.classList.remove('open'); });
+</script>
+</body>
+</html>
