@@ -27,7 +27,15 @@ Every seed produces a different ground material, terrain profile, and plant layo
 
 ## Installation
 
-The extension is published to the Isaac Sim Extensions registry as a community extension. In Isaac Sim, open **Window > Extensions**, switch to the **Third Party** tab, search for **FieldForge**, and enable it.
+FieldForge is published through the Omniverse **Kit Community Registry**, which Isaac Sim does not include as a source by default — you need to add it once:
+
+1. In Isaac Sim, open **Window > Extensions**.
+2. Open the **options** (☰) menu, choose **Settings**, and in the **Extension Registries** section click the green **+** to add:
+   * **Name:** `kit/community`
+   * **URL:** `https://dw290v42wisod.cloudfront.net/exts/kit/community`
+3. Switch to the **Third Party** tab, search for **FieldForge**, and enable it.
+
+Community extensions are unverified by NVIDIA, so FieldForge is listed under **Community - Unverified**.
 
 To install manually or for development, clone this repository into your Isaac Sim extensions folder and enable it from the same **Extensions** window.
 
